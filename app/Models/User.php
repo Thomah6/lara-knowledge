@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Models;
+use App\Models\Article;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -46,5 +47,9 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+     public function articles(){
+        return $this->hasMany(Article::class);
     }
 }
