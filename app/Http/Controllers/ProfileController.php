@@ -6,6 +6,7 @@ use App\Http\Requests\ProfileUpdateRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 
@@ -26,11 +27,24 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        dd($request->all());
         $request->user()->fill($request->validated());
-
+        
         if ($request->user()->isDirty('email')) {
             $request->user()->email_verified_at = null;
+        }
+        
+        if($request->hasFile('avatar')){
+            // dd($request->all());
+            //supprimer l'ancienne image
+                if($request->user()->avatar){
+                    Storage::disk('public')->delete($request->user()->avatar);
+                }
+            //stocker la nouvell
+            $path=$request->file('avatar')->store('avatars','public');
+            // dd($path);
+            //sauvegarder le chemin de l'image dans la bdd
+            $request->user()->avatar=$path;
+            $request->user()->save();
         }
 
         $request->user()->save();
